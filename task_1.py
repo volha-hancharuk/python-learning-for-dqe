@@ -1,8 +1,8 @@
 import random
 
-random.seed(22)                                             # for debugging purpose to generate stable random list
+# random.seed(22)                                           # for debugging purpose to generate stable random list
 # create list of 100 random numbers from 0 to 1000
-random_list = [random.randint(0, 1001) for _ in range(100)]
+random_list = [random.randint(0, 1000) for _ in range(100)]
 # sort list from min to max
 sorted_list = []                                            # initialize empty sorted list
 
