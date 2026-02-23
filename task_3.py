@@ -14,7 +14,7 @@ splitted_text.pop(-1)																						# remove excessive empty sentence app
 normalized_text = []																					    # initialize empty list to collect normalized sentences
 additional_sentence = []																					# initialize empty list to collect the last words in all sentences
 
-for i, sentence in enumerate(splitted_text):																# iterate over each sentence
+for i, sentence in enumerate(splitted_text):																# iterate through each sentence
     if i == 0:																								# condition for the first word to save colon at the and of string
         capitalized_sentence = sentence.capitalize()														# make the first letter capital
         normalized_text.append(f"{capitalized_sentence}:")													# add sentence to the normalized text list
@@ -34,7 +34,7 @@ new_sentence = ''.join(' ' + word for word in additional_sentence)              
 normalized_text.insert(index_to_add_sentence + 1, f'{new_sentence}.')                               # add a new sentence to the end of the second paragraph
 
 space_num = 0                                                                                               # initialize the sum of whitespaces
-for s in text:                                                                                              # iterate over symbols in the initial text
+for s in text:                                                                                              # iterate through each symbols in the initial text
     if s.isspace():                                                                                         # check if the symbol is whitespace
         space_num += 1                                                                                      # update sum if symbol is whitespace
 
