@@ -14,19 +14,21 @@ def get_new_sentence(capitalized_text):
 
 def fix_mistake(mistake, replacement):
     def decorator(func):                                                                                        # receives function to decorate
-        def wrapper(text):                                                                                      # wrapper replaces original function
-            result = func(text)                                                                                 # call original function first
+        def wrapper(*args, **kwargs):                                                                                      # wrapper replaces original function
+            result = func(*args, **kwargs)                                                                                 # call original function first
             return [s.replace(mistake, replacement) for s in result]                                            # replace mistake with replacement in each sentence
         return wrapper                                                                                          # return modified wrapper instead of original function
     return decorator                                                                                            # return decorator function
 
 
 @fix_mistake(' iz ', ' is ')                                                                 # apply decorator: fix " iz " after capitalization function runs
-def capitalize_text(text):
-    split_text = re.findall(r'[^.!?:]+[.!?:]+', text)                                                   # split full text into sentences including punctuation
+def capitalize_text(text, protected_words=[], sentence_pattern: str = r'[^.!?:]+[.!?:]+'):
+    split_text = re.findall(sentence_pattern, text)                                                   # split full text into sentences including punctuation
     capitalized_text = []                                                                                       # empty list to store normalized sentences
     for sentence in split_text:															    	                # iterate through each sentence
         capitalized_sentence = sentence.strip().capitalize()												    # remove excessive whitespaces and capitalize the first letter in the sentence
+        for w in protected_words:
+            capitalized_sentence = re.sub(rf'\b{w.lower()}\b', w, capitalized_sentence, flags=re.IGNORECASE)    # to prevent lower case for last names, cities, etc.
         capitalized_sentence = re.sub(r'[A-Za-z].*', f'{capitalized_sentence}', sentence)	        # replace text in initial sentence with capitalized text keeping original leading spaces/indentation
         capitalized_text.append(capitalized_sentence)															# add formatted sentence to list
     return capitalized_text
