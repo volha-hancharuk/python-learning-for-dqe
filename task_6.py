@@ -2,13 +2,14 @@ from abc import ABC, abstractmethod
 from datetime import datetime, date
 import os
 import task_3_refactored
+import task_7
 
 
 protected_words = ['M2', 'Służewiec', 'Poland', 'Prime Minister', 'Tusk', 'European', 'April', 'Warsaw', 'Half Marathon',
                    'Mokotów', 'Wilanów', 'National Bank', 'Middle East', 'Leonardo', 'Michał Anioł', 'Art Box',
                    'mObywatel', 'EU', 'ID', 'Poles', 'Yumi Zouma', 'Live', 'Hydrozagadka', 'Dawid Podsiadło',
                    'Arena Tour', 'Chopin', 'Piano', 'Concert', 'Heart', 'Gallery', 'ZPAF', 'Ichiko Aoba', 'size L',
-                   'Pardon', 'To Tu', 'Indie', 'Night', 'Special', 'IKEA', 'BRIMNES']
+                   'Pardon', 'To Tu', 'Indie', 'Night', 'Special', 'IKEA', 'BRIMNES', 'Rockrider ST']
 
 
 class NewsFeedItems(ABC):
@@ -74,8 +75,8 @@ class Event(NewsFeedItems):
 
 
 class TextFile:
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, filename_to_publish: str = None):
+        self.filename_to_publish = filename_to_publish
 
     def _ask_file_path(self):
         default_folder = "feeds"
@@ -152,7 +153,6 @@ class TextFile:
             return
 
         added_count = 0
-        filename = NewsFeed().filename
         successful = []
         failed = []
         for existing_feed in existing_feeds:
@@ -180,7 +180,7 @@ class TextFile:
                 else:
                     raise ValueError(f"Incorrect format record '{existing_feed}'.")
                 successful.append(existing_feed)
-                with open(filename, "a", encoding="utf-8") as f:
+                with open(self.filename_to_publish, "a", encoding="utf-8") as f:
                     f.write(record.publish())
             except Exception as e:
                 print(f"Skipped invalid record:\n{existing_feed}\n→ {e}\n")
@@ -196,8 +196,14 @@ class TextFile:
 
 
 class NewsFeed:
-    def __init__(self, filename: str = "news_feed_task_6.txt"):
+    def __init__(self, filename: str = "news_feed.txt"):
         self.filename = filename
+
+        if not os.path.exists(filename):
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write("News feed:\n\n")
+            print(f"Created new feed file: {filename}")
+            print("Added initial header: 'News feed:'")
 
     def interactive_mode(self):
         while True:
@@ -219,15 +225,18 @@ class NewsFeed:
                         text = input("News text: ").strip()
                         city = input("City: ").strip()
                         record = News(text, city)
+                        break
                     elif select_feed_type == 'private ad':
                         text = input("Ad text: ").strip()
                         exp = input("Expiration (DD/MM/YYYY): ").strip()
                         record = PrivateAd(text, exp)
+                        break
                     elif select_feed_type == 'event':
                         text = input("Ad text: ").strip()
                         city = input("City: ").strip()
                         exp = input("Expiration (DD/MM/YYYY HH:MM): ").strip()
                         record = Event(text, city, exp)
+                        break
                     else:
                         print("Wrong type. Use exactly news, private ad, event")
                         continue
@@ -236,19 +245,27 @@ class NewsFeed:
                         f.write(record.publish())
 
                     print(f"\nRecord added to {self.filename}")
-                    return
+                    break
 
             elif select_adding_type == '2':
                 file_path = TextFile(None)._ask_file_path()
                 if not file_path:
                     return
-                importer = TextFile(file_path)
+                importer = TextFile(self.filename)
                 importer.process_text_file(file_path)
-                return
+
             elif select_adding_type == '0':
                 break
             else:
                 print("Invalid choice.")
+                continue
+
+            with open(self.filename, 'r') as f:
+                content = f.read()
+                task_7.count_words(content)
+                task_7.count_letters(content)
+
+            return
 
 
 if __name__ == '__main__':
